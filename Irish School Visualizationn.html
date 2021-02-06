@@ -1,0 +1,274 @@
+<html>
+   <head>
+      <title> Adrian Martin Bethencourt </title>
+    <script src="https://cdn.jsdelivr.net/npm/vega@5.9.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-lite@4.0.2"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vega-embed@6.2.1"></script>
+      <style>
+         body {
+         font-family: sans-serif;
+         }
+      </style>
+   </head>
+   <body>
+      <table style="width: 850px;" cellspacing="5" cellpadding="5">
+         <tbody>
+            <tr>
+               <td style="width: 200px; vertical-align: top;"><strong>Author:&nbsp;</strong></td>
+               <td style="vertical-align: top;">Adrian Martin Bethencourt</td>
+            </tr>
+                       <tr>
+               <td style="vertical-align: top;"><strong>Dataset description:</strong></td>
+               <td style="vertical-align: top;"> The following data set contains the main information related to Irish primary schools by county, sex and number of students.               </td>
+            </tr>
+            <tr>
+               <td style="vertical-align: top;"><strong>Interactivity</strong></td>
+               <td style="vertical-align: top;">
+ The point map shows the location of all Ireland primary schools. Each point is scaled according to the total number of students in the school and coloured according to the sex of the school (all boys, all girls, mixed). 
+Clicking on the legend allows filtering to show only one type of school (e.g. boys schools only). This is reflected both on the map and the two other charts.
+The bar chart on the left shows the number of schools in each county. 
+Clicking on a county on the bar chart should filter the map on the right so that only schools from that county are shown. 
+The chart at the bottom of the image is a histogram that shows the distribution of school sizes (in terms of student numbers). This allows a brush selection so that it is possible to select schools with a certain enrolment: 
+            </tr>
+         </tbody>
+      </table>
+      <hr />
+      <div id="vis"></div>
+      <hr />
+      <table style="width: 850px;" cellspacing="5" cellpadding="5">
+         <tbody>
+            
+            </tr>
+         </tbody>
+      </table>
+      <script type="text/javascript">
+        var yourVlSpec = {"$schema": "https://vega.github.io/schema/vega-lite/v4.json",
+"description": " Graph comments. -BRUSH: I have introduced a predetermined brush selection. This allows me to control the limits of the Number of students by school bar chart. When changing the Sex or the County graph«s limits used to go away from the graph. This brush selection allows me to fix the problem. -COLOR: Focusing on the Number of Schools by County Bar chart. I have not been able to make the non-selected Counties to have an opacity value. I have decided to apply a light grey default value for the non selected Counties. This solution will keep de essence of the graph by making the non-selected values less visible than the selected one.",
+"data": {
+    "url": "https://raw.githubusercontent.com/colmr/vis_class/master/primary_schools.csv"},
+
+    
+"hconcat":[
+   {     "transform": [{"filter": {"selection": "brush"}},
+     {"filter": {"selection": "Sexo"}}],
+    "data": {"url": "https://raw.githubusercontent.com/colmr/vis_class/master/primary_schools.csv"},
+
+
+"selection": {
+    "County": {
+      "type": "multi", "fields": ["County"]
+    }
+  },
+
+
+  
+  "mark": "bar",
+    "encoding": { 
+
+     "order":{
+       "aggregate": "count",
+       "type":"quantitative",
+       "field":"County",
+       "sort":"descending"
+          },
+         
+             
+    "x": {"aggregate": "count",
+      "type": "quantitative" ,
+      "axis": {
+    "tickCount":2,
+            "titleFontSize": 20,
+            "title": "Number of Schools",
+            "minExtent": 30,
+             "labelFontSize":15}},
+
+    "y": {"field": "County", "type": "nominal",
+    "axis":{"title":null, "labelFontSize":15}},
+
+   
+    "color": {
+      "condition":{
+
+        "field":"Sex",
+        "scale":{
+          "range":["#00C7A9","#8101FA","#0085c7"]
+          },
+          "selection":"County",
+          "type":"nominal"},
+          "value":"lightgrey"
+        }
+   
+   
+    
+   
+  },
+     "height": 930
+
+      
+   }
+     ,
+
+    {
+
+  "vconcat": [
+   
+    {     
+  "layer": [
+  
+    {
+      "data": {
+        "url": "https://raw.githubusercontent.com/colmr/vis_class/master/Ireland_custom_topjson.json",
+        "format": {
+          "type": "topojson",
+          "feature": "IRL_adm1"
+        }
+      },
+
+      "transform": [{
+    "lookup": "id",
+    "from": {
+      "data": {"url": "https://raw.githubusercontent.com/colmr/vis_class/master/IrishCountyPopulations.csv"},
+      "key": "County",
+      "fields": ["Population"]
+    }
+  }],
+      "mark": {
+        "type": "geoshape",
+        "stroke": "white",
+        "fill":"#ccc"
+      }
+
+    },
+    
+   
+    {
+      "transform": [{"filter": {"selection": "brush"}},
+     {"filter": {"selection": "County"}}],
+      
+
+      "data": {
+    "url": "https://raw.githubusercontent.com/colmr/vis_class/master/primary_schools.csv"
+  },
+  "mark": "circle",
+
+
+"selection": {
+    "Sexo": {
+      "type": "single", "fields": ["Sex"], "bind": "legend"
+    }
+  },
+
+  "encoding": {
+    "longitude": {
+      "field": "Long",
+      "type": "quantitative"
+    },
+    "latitude": {
+      "field": "Lat",
+      "type": "quantitative"
+    },
+      
+    "color":{"field":"Sex", "type":"nominal",
+    "scale": {"domain":["Boys","Girls","Mixed"], "range": [ "#00C7A9","#8101FA","#0085c7"]},
+     "legend": {"titleFontSize": 20,
+     "labelFontSize":15}},
+    "opacity": {
+       "condition": {"selection": "Sexo","value": 0.8},
+      "value": 0
+    },
+    
+    "size": {
+"field":"Total",
+"scale": {
+        "type": "threshold",
+        "domain": [250, 501,750]},
+"type":"quantitative",
+
+     "legend": {"titleFontSize": 20,
+     "labelFontSize":15}
+
+    }
+  }},
+  
+  {
+      "data": {
+        "url": "https://raw.githubusercontent.com/colmr/vis_class/master/Counties__OSi_National_Placenames_Gazetteer.csv",  "format": {
+      "type": "csv"
+    }
+      },
+      "mark": {"type":"text", "dx":12, "fontStyle":"bold"},
+
+      "encoding": {
+        "longitude": {
+          "field": "X",
+          "type": "quantitative"
+        },
+        "latitude": {
+          "field": "Y",
+          "type": "quantitative"
+        },
+        "text":{"field": "County", "type":"nominal"},
+        "size": {"value": 13}
+      }
+    }
+
+  ],
+  "config": {
+    "legend": {
+      "orient":"top-left"
+    }
+ },
+      "width": 600,
+  "height": 700,
+  "projection": {
+        "type": "conicConformal"}
+    
+},
+
+
+
+    {
+    "data": {"url": "https://raw.githubusercontent.com/colmr/vis_class/master/primary_schools.csv"},
+      "transform": [{"filter": {"selection": "County"}},
+       {"filter": {"selection": "Sexo"}}],
+  "mark": "bar",
+  "selection":{
+    "brush":{
+      "type":"interval",
+      "init":{"x":[0,450],"y":[0,40]}
+      }
+  },
+  "encoding": {
+    "y": {"field": "Roll_No","aggregate":"count",
+    "axis": {
+            "titleFontSize": 15,
+            "title": "Schools",
+            "minExtent": 30,
+            "labelFontSize":15},
+      "type": "quantitative"},
+    "x": {"field": "Total", "type": "quantitative",
+    "bin": {"maxbins":52},
+    "axis": {
+            "titleFontSize": 20,
+            "title": "Number of Students",
+            "minExtent": 30,
+            "labelFontSize":15}},
+    "color": {"value": "black"}
+  },
+  "width": 600,
+  "height": 200
+    }
+    ]
+}
+]
+}
+
+
+
+
+
+
+            vegaEmbed("#vis", yourVlSpec);
+      </script>
+   </body>
+</html>
